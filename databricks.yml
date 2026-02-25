@@ -1,0 +1,27 @@
+bundle:
+  name: nyc-taxi-2014
+
+include:
+  - resources/*.yml
+
+targets:
+  # Development Environment
+  dev:
+    default: true
+    workspace:
+      host: ${workspace.host}
+    parameters:
+      catalog_name: nyc_taxi_dev
+  # Production Environment
+  prod:
+    workspace:
+      host: ${workspace.host}
+    parameters:
+      catalog_name: nyc_taxi_prod
+    # Production jobs usually run on a specific schedule or larger clusters
+    resources:
+      jobs:
+        taxi_2014_pipeline:
+          schedule:
+            quartz_cron_expression: "0 0 2 * * ?" # Runs at 2 AM daily
+            timezone_id: UTC

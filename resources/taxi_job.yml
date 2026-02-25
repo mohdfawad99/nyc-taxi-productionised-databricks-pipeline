@@ -1,0 +1,27 @@
+resources:
+  jobs:
+    taxi_2014_pipeline:
+      name: "[${bundle.target}] NYC Taxi Pipeline"
+      tasks:
+        - task_key: Bronze_Ingestion
+          notebook_task:
+            notebook_path: ../src/01_Ingestion_Bronze
+            base_parameters:
+              # This dynamically picks 'nyc_taxi_dev' or 'nyc_taxi_prod'
+              catalog_name: ${bundle.targets[bundle.target].parameters.catalog_name}
+        
+        - task_key: Silver_Transformation
+          depends_on:
+            - task_key: Bronze_Ingestion
+          notebook_task:
+            notebook_path: ../src/02_Transformation_Silver
+            base_parameters:
+              catalog_name: ${bundle.targets[bundle.target].parameters.catalog_name}
+
+        - task_key: Gold_Aggregation
+          depends_on:
+            - task_key: Silver_Transformation
+          notebook_task:
+            notebook_path: ../src/03_Analytics_Gold
+            base_parameters:
+              catalog_name: ${bundle.targets[bundle.target].parameters.catalog_name}
